@@ -1,0 +1,34 @@
+{
+  "manifest_version": 2,
+  "name": "ES6 Resurrector",
+  "version": "1.0",
+  "description": "The best extension for my friends",
+
+  "icons":{
+    "48" : "img/icon48.png",
+    "16" : "img/icon16.png"
+  },
+
+
+  "permissions": [
+        "contextMenus",
+        "activeTab",
+        "tabs",
+        "notifications"
+  ],
+
+  "content_scripts": [
+  {
+    "matches": ["https://*/*"],
+    "css": ["css/style.css"],
+    "js": ["js/jquery-3.2.1.min.js", "js/es6-shim-polyfill.es5.js", "content.js"]
+  }
+  ],
+
+  "web_accessible_resources": [
+      "toolbar.html",
+      "css/extension_style.css"
+  ]
+
+}
+
