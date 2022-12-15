@@ -20,8 +20,9 @@
   "content_scripts": [
   {
     "matches": ["https://*/*"],
+    "run_at": "document_start",
     "css": ["css/style.css"],
-    "js": ["js/jquery-3.2.1.min.js", "js/es6-shim-polyfill.es5.js", "content.js"]
+    "js": ["js/es6-shim-polyfill.es5.js", "js/web-streams-polyfill.es6.min.js", "content.js"]
   }
   ],
 
