@@ -19,17 +19,25 @@
 
   "content_scripts": [
   {
-    "matches": ["https://*/*"],
+    "matches": ["https://*/*", "http://*/*"],
     "run_at": "document_start",
-    "css": ["css/style.css"],
-    "js": ["js/es6-shim-polyfill.es5.js", "js/web-streams-polyfill.es6.min.js", "content.js"]
+    "css": [],
+    "js": [
+		"js/jquery-3.2.1.min.js",
+		"js/es6-shim-polyfill.es5.js",
+		"js/web-streams-polyfill.es6.min.js",
+		"js/cross-fetch.js",
+		"content.js"
+	]
   }
   ],
 
   "web_accessible_resources": [
-      "toolbar.html",
-      "css/extension_style.css"
+		"js/jquery-3.2.1.min.js",
+		"js/es6-shim-polyfill.es5.js", 
+		"js/web-streams-polyfill.es6.min.js",
+		"js/cross-fetch.js",		
+		"content.js"
   ]
-
 }
 

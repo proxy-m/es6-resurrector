@@ -48,10 +48,12 @@ if (!Object.keys) {
 
 //////////////////////////////////////////////
 
+/* eslint-disable no-underscore-dangle, no-restricted-properties */
+/* eslint-disable no-proto */
 
 (function (root, factory) {
     factory();
-}(this, function() {
+}(window, function() {
     var call = Function.call;
     var prototypeOfObject = Object.prototype;
     var owns = call.bind(prototypeOfObject.hasOwnProperty);
@@ -65,12 +67,10 @@ if (!Object.keys) {
     var lookupSetter;
     var supportsAccessors = owns(prototypeOfObject, '__defineGetter__');
     if (supportsAccessors) {
-        /* eslint-disable no-underscore-dangle, no-restricted-properties */
         defineGetter = call.bind(prototypeOfObject.__defineGetter__);
         defineSetter = call.bind(prototypeOfObject.__defineSetter__);
         lookupGetter = call.bind(prototypeOfObject.__lookupGetter__);
         lookupSetter = call.bind(prototypeOfObject.__lookupSetter__);
-        /* eslint-enable no-underscore-dangle, no-restricted-properties */
     }
 
     var isPrimitive = function isPrimitive(o) {
@@ -132,7 +132,6 @@ if (!Object.keys) {
     if (!Object.getOwnPropertyDescriptor || getOwnPropertyDescriptorFallback) {
         var ERR_NON_OBJECT = 'Object.getOwnPropertyDescriptor called on a non-object: ';
 
-        /* eslint-disable no-proto */
         Object.getOwnPropertyDescriptor = function getOwnPropertyDescriptor(object, property) {
             if (isPrimitive(object)) {
                 throw new TypeError(ERR_NON_OBJECT + object);
@@ -206,7 +205,6 @@ if (!Object.keys) {
             descriptor.writable = true;
             return descriptor;
         };
-        /* eslint-enable no-proto */
     }
 
 
@@ -261,8 +259,7 @@ if (!Object.keys) {
             return empty;
         };
 
-        /* global document */
-        if (supportsProto || typeof document === 'undefined') {
+        if (supportsProto || typeof document === 'undefined') { // global document
             createEmpty = function () {
                 return { __proto__: null };
             };
@@ -407,24 +404,12 @@ if (!Object.keys) {
             if ('value' in descriptor) {
                 // fail silently if 'writable', 'enumerable', or 'configurable'
                 // are requested but not supported
-                /*
-                // alternate approach:
-                if ( // can't implement these features; allow false but not true
-                    ('writable' in descriptor && !descriptor.writable) ||
-                    ('enumerable' in descriptor && !descriptor.enumerable) ||
-                    ('configurable' in descriptor && !descriptor.configurable)
-                ))
-                    throw new RangeError(
-                        'This implementation of Object.defineProperty does not support configurable, enumerable, or writable.'
-                    );
-                */
 
                 if (supportsAccessors && (lookupGetter(object, property) || lookupSetter(object, property))) {
                     // As accessors are supported only on engines implementing
                     // `__proto__` we can safely override `__proto__` while defining
                     // a property to make sure that we don't hit an inherited
                     // accessor.
-                    /* eslint-disable no-proto */
                     var prototype = object.__proto__;
                     object.__proto__ = prototypeOfObject;
                     // Deleting a property anyway since getter / setter may be
@@ -433,7 +418,6 @@ if (!Object.keys) {
                     object[property] = descriptor.value;
                     // Setting original `__proto__` back now.
                     object.__proto__ = prototype;
-                    /* eslint-enable no-proto */
                 } else {
                     object[property] = descriptor.value;
                 }
@@ -732,8 +716,8 @@ if (!Object.is) {
 }
 
 if (!Object.hasOwn) {
-    console.error('Object.hasOwn is not implemented');
-    /*Object.hasOwn = function hasOwn (O, P) {
+    ///console.error('Object.hasOwn is not implemented');
+    Object.hasOwn = function hasOwn (O, P) {
         var hasSymbols = typeof Symbol === 'function' && Symbol && typeof Symbol.iterator === 'symbol';
         var hasToStringTag = typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol'; 
         var fnToStr = Function.prototype.toString;
@@ -819,7 +803,7 @@ var tryFunctionObject = function tryFunctionToStr(value) {
         };
         var ToObject = function ToObject(value) {
             RequireObjectCoercible(value);
-            return $Object(value);
+            return Object.assign({}, value);
         };
         var GetMethod = function GetMethod(O, P) {
 	var func = O[P];
@@ -884,21 +868,34 @@ var tryFunctionObject = function tryFunctionToStr(value) {
 	}
 	return ordinaryToPrimitive(input, hint === 'default' ? 'number' : hint);
 };
-        var ToPrimitive = function ToPrimitive(input) {
-            if (arguments.length > 1) {
-                return toPrimitive(input, arguments[1]);
-            }
-            return toPrimitive(input);
-        };
-        var ToString = require('./ToString');
-        var ToPropertyKey = function ToPropertyKey(argument) {
-            var key = ToPrimitive(argument, $String);
-            return typeof key === 'symbol' ? key : ToString(key);
-        };
-        var HasOwnProperty = require('es-abstract/2022/HasOwnProperty');
 
-        var obj = ToObject(O);
-        var key = ToPropertyKey(P);
-        return HasOwnProperty(obj, key);
-    }*/
+	var isObject = function (A) {
+		return ( (typeof A === "object" || typeof A === 'function') && (A !== null) );
+	};
+   
+	var ToPrimitive = function(it){
+		var fn, val;
+		if(typeof (fn = it.valueOf) == 'function' && !isObject(val = fn.call(it)))return val;
+		if(typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
+		throw TypeError("Can't convert object to number");
+	};
+	
+	function ToPropertyKey(argument) {
+		var key = ToPrimitive(argument/*, $String*/);
+		return typeof key === 'symbol' ? key : /*ToString*/''+(key);
+	};
+		return Object.hasOwnProperty.call(ToObject(O), ToPropertyKey(P));
+	}
+}
+
+if (typeof globalThis === 'undefined') {
+	globalThis = function () {
+		if (typeof self !== 'undefined') {
+			return self;
+		} else if (typeof window !== 'undefined') {
+			return window;
+		} else {
+			return Function('return this')();
+		}
+	}();
 }
