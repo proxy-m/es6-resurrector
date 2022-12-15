@@ -1,7 +1,7 @@
 /*!
- * @license es6-shim Copyright 2013-2016 by Mikhail B.
+ * @license es6-shim Copyright 2013-2022 by Mikhail B.
  *   and contributors,  MIT License
- * es6-shim-polyfill: v0.55.1
+ * es6-shim-polyfill: v0.56.3
  */
 
 
