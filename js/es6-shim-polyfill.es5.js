@@ -1,7 +1,7 @@
 /*!
  * @license es6-shim Copyright 2013-2022 by Mikhail B.
  *   and contributors,  MIT License
- * es6-shim-polyfill: v0.56.3
+ * es6-shim-polyfill: v0.57.4
  */
 
 
@@ -557,6 +557,31 @@ if (!Object.keys) {
 }));
 
 
+if (!window.Reflect) {
+    window.Reflect = {};
+    var noSymbolAtAll = !!window.Symbol;
+    if (noSymbolAtAll) {
+        window.Symbol = {};
+    }
+    var toStringTag = !!Symbol.toStringTag ? Symbol.toStringTag : null;
+    const toStringReflectCorrect = '[object Reflect]';
+    Reflect[toStringTag] = 'Reflect';
+    if (Reflect.toString() != toStringReflectCorrect) {
+        Reflect.toString = function toString () {
+            return toStringReflectCorrect;
+        }
+    }    
+    if (noSymbolAtAll) {
+        delete window.Symbol;
+    }
+}
+if (!Reflect.ownKeys) {
+    const gOPNs = Object.getOwnPropertyNames;
+    const gOPSs = Object.getOwnPropertySymbols;
+    Reflect.ownKeys = function (object) {
+        return gOPNs(object).concat(gOPSs ? gOPSs(object) : []);
+    };
+}
 
 
 //--ES6-SHIM-POLYFILL:----------------------------------
