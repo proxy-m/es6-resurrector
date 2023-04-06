@@ -888,6 +888,29 @@ var tryFunctionObject = function tryFunctionToStr(value) {
 	}
 }
 
+if (!Object.fromEntries) {
+  Object.defineProperty(Object, 'fromEntries', {
+    value(entries) {
+      if (!entries) { throw new Error('Object.fromEntries() requires a single iterable argument'); } // || !entries[Symbol.iterator]
+      const obj = {};
+      var pair;
+      for (pair of entries) {
+        if (Object(pair) !== pair) {
+          throw new TypeError('iterable for fromEntries should yield objects');
+        }
+        const {'0': key, '1': val} = pair; // Consistency with Map: contract is that entry has "0" and "1" keys, not that it is an array or iterable.
+        Object.defineProperty(obj, key, {
+          configurable: true,
+          enumerable: true,
+          writable: true,
+          value: val,
+        });
+      }
+      return obj;
+    },
+  });
+}
+
 if (typeof globalThis === 'undefined') {
 	globalThis = function () {
 		if (typeof self !== 'undefined') {
